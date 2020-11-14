@@ -1,0 +1,45 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# sta545package
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of the sta545package is to implement the methods in David Cox's 1972 paper *Regression Models and Life Tables* for use in a project for the class "STA 545: Statistical Data Mining" at the University of Buffalo.
+
+## Installation
+
+You can install the released version of the sta545package from [GitHub](https://github.com/) with:
+
+``` r
+install.packages("devtools")
+devtools::install_github("mathmonster/sta545package")
+```
+
+## Examples
+
+### Kaplan-Meier Product Limit Estimator:
+
+```{r Kaplan_Meier}
+library(sta545package)
+plot(fitkm(remission ~ sample, delta="censor", data=leukemia))
+```
+
+### Cox Proportional Hazards Model
+
+```{r Cox_Model}
+fitcox(remission ~ sample, delta="censor", data=leukemia)
+```

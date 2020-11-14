@@ -1,0 +1,15 @@
+Package: sta545package
+Type: Package
+Title: STA 545 Project
+Version: 0.1.0
+Authors@R: c(
+    person("Adam", "Cunningham", email = "adamcunn@buffalo.edu", role = c("aut", "cre")),
+    person("Gabriel", "Anaya", email = "ganaya@buffalo.edu", role = c("aut")))
+Maintainer: <adamcunn@buffalo.edu>
+Description: Functions for STA 545 project
+    Implements Cox PH model and Kaplan-Meier product limit estimator.
+Depends: R (>= 3.5.0)
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.1
