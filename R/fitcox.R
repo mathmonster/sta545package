@@ -60,9 +60,9 @@ fitcox <- function(formula, delta, data) {
 
   # Wald test used for coefficients
   beta.z <- beta/beta.se
-  beta.p <- 2*(1 - pnorm(beta.z))
+  beta.p <- 2*pnorm(-abs(beta.z))
 
-  # Lieklihood ratio test
+  # Likelihood ratio test
   lrt <- 2*(partial.log.likelihood(beta, event.sets, risk.set.diffs)
             - partial.log.likelihood(rep(0, p), event.sets, risk.set.diffs))
   lrt.p <- 1 - pchisq(lrt, df=1)
