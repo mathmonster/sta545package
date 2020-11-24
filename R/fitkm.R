@@ -92,6 +92,7 @@ summary.fitkm <- function(model) {
 #' @param model A \code{fitkm} object returned by the \code{\link{fitkm}} function.
 #' @param xlab String for the x-axis label
 #' @param ylab String for the y-axis label
+#' @param legend.cex Font size for the legend
 #' @param ... Further graphical parameters to be passed to \code{plot}
 #' @return An object of class \code{summary.fitkm}.
 #' @examples
@@ -101,7 +102,7 @@ summary.fitkm <- function(model) {
 #' @importFrom grDevices hcl.colors
 #' @export
 
-plot.fitkm <- function(model, xlab="Time", ylab="Survival Probability", ...) {
+plot.fitkm <- function(model, xlab="Time", ylab="Survival Probability", legend.cex=1, ...) {
   n.curves <- length(model)
   if (n.curves > 1) {
     line.colors <- hcl.colors(n.curves, palette="Zissou 1")
@@ -123,7 +124,7 @@ plot.fitkm <- function(model, xlab="Time", ylab="Survival Probability", ...) {
 
   # Add a legend if more than one curve being plotted
   if (n.curves > 1) {
-    legend("topright", legend=names(model), col=line.colors, lwd=2)
+    legend("topright", legend=names(model), col=line.colors, lwd=2, cex=legend.cex)
   }
 }
 

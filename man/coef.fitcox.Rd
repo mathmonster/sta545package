@@ -15,6 +15,17 @@ A dataframe with one row per coefficient
 \description{
 Extract the coefficients for a fitted Cox model
 }
+\details{
+Coefficient details include:
+\describe{
+   \item{beta}{The value of the coefficient}
+   \item{beta.se}{Standard error for the coefficient}
+   \item{beta.lower}{Lower bound of 95\% confidence interval}
+   \item{beta.upper}{Upper bound of 95\% confidence interval}
+   \item{z}{Wald statistic i.e. beta/beta.se}
+   \item{p}{p-value for the Wald statistic}
+}
+}
 \examples{
 coef(fitcox(remission ~ sample, delta="censor", data=leukemia))
 }

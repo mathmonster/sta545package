@@ -19,6 +19,17 @@ An object of class \code{fitcox}.
 \description{
 \code{fitcox} fits a Cox proportional hazards model.
 }
+\details{
+The object returned has the attributes:
+\describe{
+   \item{n}{The total number of observations}
+   \item{n.events}{The number of events i.e. uncensored observations}
+   \item{n.times}{The number of distinct event times}
+   \item{event.times}{The distinct event times}
+   \item{event.counts}{The number of events taking place at each event time}
+   \item{h0}{The baseline hazard at each event time}
+}
+}
 \examples{
 fitcox(remission ~ sample, delta="censor", data=leukemia)
 }

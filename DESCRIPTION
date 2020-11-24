@@ -1,7 +1,7 @@
 Package: sta545package
 Type: Package
 Title: STA 545 Project
-Version: 0.1.1
+Version: 0.2.0
 Authors@R: c(
     person("Adam", "Cunningham", email = "adamcunn@buffalo.edu", role = c("aut", "cre")),
     person("Gabriel", "Anaya", email = "ganaya@buffalo.edu", role = c("aut")))

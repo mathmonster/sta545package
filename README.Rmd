@@ -41,5 +41,10 @@ plot(fitkm(remission ~ sample, delta="censor", data=leukemia))
 ### Cox Proportional Hazards Model
 
 ```{r Cox_Model}
-fitcox(remission ~ sample, delta="censor", data=leukemia)
+fitcox.leukemia <- fitcox(remission ~ sample, delta="censor", data=leukemia)
+summary(fitcox.leukemia)
+```
+
+```{r Cox_Model_Predict}
+predict(fitcox.leukemia, newdata=leukemia, type="expected")
 ```

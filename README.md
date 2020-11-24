@@ -36,10 +36,19 @@ plot(fitkm(remission ~ sample, delta="censor", data=leukemia))
 ### Cox Proportional Hazards Model
 
 ``` r
-fitcox(remission ~ sample, delta="censor", data=leukemia)
-#>                beta beta.se  lower upper     z         p
-#> samplecontrol 1.572  0.4124 0.7638  2.38 3.812 0.0001378
-#> 
-#> n = 42, number of events = 30, distinct event times = 17
-#> Likelihood ratio test: 16.35169, p = 5.260921e-05
+fitcox.leukemia <- fitcox(remission ~ sample, delta="censor", data=leukemia)
+summary(fitcox.leukemia)
+#>                   beta   beta.se     lower    upper        z            p
+#> samplecontrol 1.572125 0.4123967 0.7638424 2.380408 3.812167 0.0001377538
+```
+
+``` r
+predict(fitcox.leukemia, newdata=leukemia, type="expected")
+#>  [1] 0.12494530 0.12494530 0.12494530 0.12494530 0.13831384 0.19251256
+#>  [7] 0.21119193 0.21119193 0.25000051 0.33088088 0.40321139 0.44411015
+#> [13] 0.44411015 0.44411015 0.56434764 0.74924395 0.74924395 0.74924395
+#> [19] 0.74924395 0.74924395 0.74924395 0.07886537 0.07886537 0.16448300
+#> [25] 0.16448300 0.21130019 0.30953359 0.30953359 0.41846799 0.41846799
+#> [31] 0.92730867 0.92730867 0.92730867 0.92730867 1.20422089 1.20422089
+#> [37] 1.43975769 1.43975769 1.75295485 2.13922250 2.71839129 3.60901345
 ```

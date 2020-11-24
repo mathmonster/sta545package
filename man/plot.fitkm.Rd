@@ -4,7 +4,7 @@
 \alias{plot.fitkm}
 \title{Produces a plot for a set of one or more Kaplan-Meier curves}
 \usage{
-\method{plot}{fitkm}(model, xlab = "Time", ylab = "Survival Probability", ...)
+\method{plot}{fitkm}(model, xlab = "Time", ylab = "Survival Probability", legend.cex = 1, ...)
 }
 \arguments{
 \item{model}{A \code{fitkm} object returned by the \code{\link{fitkm}} function.}
@@ -12,6 +12,8 @@
 \item{xlab}{String for the x-axis label}
 
 \item{ylab}{String for the y-axis label}
+
+\item{legend.cex}{Font size for the legend}
 
 \item{...}{Further graphical parameters to be passed to \code{plot}}
 }

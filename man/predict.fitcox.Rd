@@ -4,18 +4,28 @@
 \alias{predict.fitcox}
 \title{Generate predictions for a fitted Cox model}
 \usage{
-\method{predict}{fitcox}(model, newdata)
+\method{predict}{fitcox}(model, newdata, type = "median")
 }
 \arguments{
 \item{model}{A \code{fitcox} object returned by the \code{fitcox} function.}
 
 \item{newdata}{A dataframe of values to generate predictions for.}
+
+\item{type}{The type of prediction to make: "median" | "expected" | "survival"}
 }
 \value{
 A vector of predictions for the new data
 }
 \description{
 Generate predictions for a fitted Cox model
+}
+\details{
+The types of prediction are:
+\describe{
+   \item{median}{The median survival times given the predictors}
+   \item{expected}{The expected number of events at the event or censoring time}
+   \item{survival}{The estimated survival probability at the event or censoring time}
+}
 }
 \examples{
 predict(fitcox(remission ~ sample, delta="censor", data=leukemia), newdata=leukemia)

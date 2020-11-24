@@ -6,6 +6,15 @@
 #' @param delta Censoring indicator.
 #' @param data A data frame.
 #' @return An object of class \code{fitcox}.
+#' @details The object returned has the attributes:
+#' \describe{
+#'    \item{n}{The total number of observations}
+#'    \item{n.events}{The number of events i.e. uncensored observations}
+#'    \item{n.times}{The number of distinct event times}
+#'    \item{event.times}{The distinct event times}
+#'    \item{event.counts}{The number of events taking place at each event time}
+#'    \item{h0}{The baseline hazard at each event time}
+#' }
 #' @examples
 #' fitcox(remission ~ sample, delta="censor", data=leukemia)
 #' @seealso \code{\link{summary.fitcox}}
@@ -29,6 +38,8 @@ fitcox <- function(formula, delta, data) {
   # Event sets are the sets of non-censored observations corresponding to the event times
   event.sets <- lapply(event.times,
                        function(t) model.matrix(formula, data=data[responses == t & deltas == 1, ]))
+
+  event.counts <- vapply(event.sets, nrow, numeric(1))
 
   # Number of coefficients is determined by the factor levels found by model.matrix
   p <- ncol(event.sets[[1]]) - 1
@@ -62,6 +73,9 @@ fitcox <- function(formula, delta, data) {
   beta.z <- beta/beta.se
   beta.p <- 2*pnorm(-abs(beta.z))
 
+  # Store baseline hazard for making predictions
+  baseline <- baseline.hazard(beta, event.counts, risk.set.diffs)
+
   # Likelihood ratio test
   lrt <- 2*(partial.log.likelihood(beta, event.sets, risk.set.diffs)
             - partial.log.likelihood(rep(0, p), event.sets, risk.set.diffs))
@@ -69,6 +83,8 @@ fitcox <- function(formula, delta, data) {
 
   results <- list(formula=formula, n=n, n.events=length(events), n.times=k,
                   parameters=colnames(event.sets[[1]])[-1],
+                  event.times=event.times, event.counts=event.counts,
+                  h0=baseline,
                   lrt=lrt, lrt.p=lrt.p,
                   beta=beta, beta.se=beta.se,
                   beta.lower=beta.lower, beta.upper=beta.upper,
@@ -201,10 +217,46 @@ partial.information <- function(beta, event.sets, risk.set.diffs) {
   return(matrix(information[-1, -1], nrow=p))
 }
 
+#' Baseline hazard for a Cox proportional hazards model
+#'
+#' @param beta A vector of length p, where p is the number of parameters in the model
+#' @param event.counts A vector of event counts corresponding to the unique event times
+#' @param risk.set.diffs A list of risk set differences corresponding to the event times
+#' @return A vector of partial derivatives for each parameter in the model
+
+baseline.hazard <- function(beta, event.counts, risk.set.diffs) {
+  k <- length(risk.set.diffs)
+  hazard <- rep(NA, k)
+
+  # First term in beta is the intercept: set to zero
+  beta <- c(0, beta)
+
+  # Running total of exp(z*beta) over the risk sets
+  R.sum <- 0
+
+  # Baseline hazard performed over the reversed event times
+  for (i in k:1) {
+    risk.set.diff <- risk.set.diffs[[i]]
+    R.sum <- R.sum + sum(exp(risk.set.diff%*%beta))
+    hazard[i] <- event.counts[i]/R.sum
+  }
+
+  return(hazard)
+}
+
 #' Extract the coefficients for a fitted Cox model
 #'
 #' @param model A \code{fitcox} object returned by the \code{fitcox} function.
 #' @return A dataframe with one row per coefficient
+#' @details Coefficient details include:
+#' \describe{
+#'    \item{beta}{The value of the coefficient}
+#'    \item{beta.se}{Standard error for the coefficient}
+#'    \item{beta.lower}{Lower bound of 95\% confidence interval}
+#'    \item{beta.upper}{Upper bound of 95\% confidence interval}
+#'    \item{z}{Wald statistic i.e. beta/beta.se}
+#'    \item{p}{p-value for the Wald statistic}
+#' }
 #' @examples
 #' coef(fitcox(remission ~ sample, delta="censor", data=leukemia))
 #' @importFrom stats coef
@@ -268,12 +320,61 @@ print.summary.fitcox <- function(summary) {
 #'
 #' @param model A \code{fitcox} object returned by the \code{fitcox} function.
 #' @param newdata A dataframe of values to generate predictions for.
+#' @param type The type of prediction to make: "median" | "expected" | "survival"
 #' @return A vector of predictions for the new data
+#' @details The types of prediction are:
+#' \describe{
+#'    \item{median}{The median survival times given the predictors}
+#'    \item{expected}{The expected number of events at the event or censoring time}
+#'    \item{survival}{The estimated survival probability at the event or censoring time}
+#' }
 #' @examples
 #' predict(fitcox(remission ~ sample, delta="censor", data=leukemia), newdata=leukemia)
 #' @importFrom stats predict
+#' @importFrom utils tail
 #' @export
 
-predict.fitcox <- function(model, newdata) {
-  X <- model.matrix(model$formula, data=newdata)
+predict.fitcox <- function(model, newdata, type="median") {
+  formula <- model$formula
+
+  # Add an event time of zero at the start for times that are before the first event
+  event.times <- c(0, model$event.times)
+  n <- nrow(newdata)
+  #n.event.times <- length(event.times)
+  results <- rep(NA, n)
+
+  # Extract the event times for the new data
+  response.var <- all.vars(formula)[1]
+  responses <- newdata[[response.var]]
+
+  # Calculate exp(z*beta) for the new data
+  X <- model.matrix(formula, data=newdata)
+  beta <- c(0, model$beta)
+  exp.betaX <- exp(X %*% beta)
+  #print(exp.betaX)
+
+  # Baseline hazard and cumulative hazard. Cumulative hazard starts at zero.
+  h0 <- model$h0
+  H0 <- c(0, cumsum(h0))
+  #print(H0)
+
+  # Find the index of the event time corresponding to the response time
+  closest.time.indices <- vapply(responses, function(t) tail(which(t >= event.times), n=1), numeric(1))
+  #print(closest.time.indices)
+
+  if (type=="expected") {
+    results <- H0[closest.time.indices]*exp.betaX
+  }
+  else if (type=="survival") {
+    results <- exp(-H0[closest.time.indices]*exp.betaX)
+  }
+  else if (type=="median") {
+    # Values of H(t) such that S(t) = 0.5
+    H <- log(2)/exp.betaX
+    # Need to find time for largest value of H0 such that H >= H0
+    H.indices <- vapply(H, function(x) tail(which(x >= H0), n=1), numeric(1))
+    results <- event.times[H.indices]
+  }
+
+  return(as.vector(results))
 }
