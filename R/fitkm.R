@@ -116,7 +116,7 @@ plot.fitkm <- function(model, xlab="Time", ylab="Survival Probability", legend.c
 
   # Add lines for the remaining curves
   if (n.curves > 1) {
-    for (i in 2:n.curves) {
+    for (i in 1:n.curves) {
       curve <- model[[i]]
       lines(curve, col=line.colors[i], ...)
       }
