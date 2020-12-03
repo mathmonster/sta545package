@@ -8,6 +8,8 @@
 #' @return An object of class \code{fitcox}.
 #' @details The object returned has the attributes:
 #' \describe{
+#'    \item{formula}{The formula used to generate the model}
+#'    \item{delta}{The column containing the censoring indicator}
 #'    \item{n}{The total number of observations}
 #'    \item{n.events}{The number of events i.e. uncensored observations}
 #'    \item{n.times}{The number of distinct event times}
@@ -37,7 +39,8 @@ fitcox <- function(formula, delta, data) {
 
   # Event sets are the sets of non-censored observations corresponding to the event times
   event.sets <- lapply(event.times,
-                       function(t) model.matrix(formula, data=data[responses == t & deltas == 1, ]))
+                       function(t) model.matrix(formula, data=data[responses == t &
+                                                                     deltas == 1, ]))
 
   event.counts <- vapply(event.sets, nrow, numeric(1))
 
@@ -45,17 +48,18 @@ fitcox <- function(formula, delta, data) {
   p <- ncol(event.sets[[1]]) - 1
 
   # Risk set differences are the sets of all observations with t(i) <= t < t(i + 1)
-  # These are the observations at risk at an event time, but not at the next event time
+  # These are the observations at risk at each event time, but not at the next
   risk.set.diffs <- list()
   for (i in 1:(k-1)) {
     t1 <- event.times[i]
     t2 <- event.times[i + 1]
-    risk.set.diffs[[i]] <- model.matrix(formula, data=data[responses >= t1 & responses < t2, ])
+    risk.set.diffs[[i]] <- model.matrix(formula, data=data[responses >= t1 &
+                                                             responses < t2, ])
   }
   # The last risk set difference contains the risk set for the final event time
   risk.set.diffs[[k]] <- model.matrix(formula, data=data[responses >= event.times[k], ])
 
-  # Use optim to find the maximum likelihood estimate
+  # Use optim to find the maximum likelihood estimate for the regression coefficients
   beta <- optim(as.matrix(rep(0, p)), partial.log.likelihood, gr=partial.score,
                 event.sets, risk.set.diffs,
                 method="BFGS", control=list(fnscale=-1))$par
@@ -81,7 +85,8 @@ fitcox <- function(formula, delta, data) {
             - partial.log.likelihood(rep(0, p), event.sets, risk.set.diffs))
   lrt.p <- 1 - pchisq(lrt, df=1)
 
-  results <- list(formula=formula, n=n, n.events=length(events), n.times=k,
+  results <- list(formula=formula, delta=delta,
+                  n=n, n.events=length(events), n.times=k,
                   parameters=colnames(event.sets[[1]])[-1],
                   event.times=event.times, event.counts=event.counts,
                   h0=baseline,
@@ -109,7 +114,7 @@ partial.log.likelihood <- function(beta, event.sets, risk.set.diffs) {
   R0 <- 0
 
   # Efron's method is performed over the reversed event times
-  # The risk set is then the union of the risk set difference and all previous risk set differences
+  # The risk set is the union of all previous risk set differences
   for (i in k:1) {
     event.set <- event.sets[[i]]
     risk.set.diff <- risk.set.diffs[[i]]
@@ -160,7 +165,8 @@ partial.score <- function(beta, event.sets, risk.set.diffs) {
     E1 <- as.vector(t(event.set)%*%exp.events.beta)
     # First term is the sum of the columns in the event set
     # Second term is the sum over the event set of the log Efron denominator
-    u <- u + apply(event.set, 2, sum) - Reduce('+', lapply(0:(d-1), function(m) (R1 - m*E1/d)/(R0 - m*E0/d)))
+    u <- u + apply(event.set, 2, sum) - Reduce('+', lapply(0:(d-1),
+                                                           function(m) (R1 - m*E1/d)/(R0 - m*E0/d)))
   }
   return(u[-1])
 }
@@ -170,7 +176,7 @@ partial.score <- function(beta, event.sets, risk.set.diffs) {
 #' @param beta A vector of length p, where p is the number of parameters in the model
 #' @param event.sets A list of model matrices corresponding to the event times
 #' @param risk.set.diffs A list of risk set differences corresponding to the event times
-#' @return A matrix of negative second partial derivatives for each pair of parameters in the model
+#' @return A matrix of negative second partial derivatives for each pair of parameters
 
 partial.information <- function(beta, event.sets, risk.set.diffs) {
   k <- length(event.sets)
@@ -209,10 +215,13 @@ partial.information <- function(beta, event.sets, risk.set.diffs) {
     E0 <- sum(exp.events.beta)
     R1 <- R1 + as.vector(t(risk.set.diff)%*%exp.risk.set.beta)
     E1 <- as.vector(t(event.set)%*%exp.events.beta)
-    R2 <- R2 + matrix(rowSums(apply(risk.set.diff, 1, function(z) outer(z, z)*exp(sum(z*beta)))), nrow = p + 1)
-    E2 <- matrix(rowSums(apply(event.set, 1, function(z) outer(z, z)*exp(sum(z*beta)))), nrow = p + 1)
+    R2 <- R2 + matrix(rowSums(apply(risk.set.diff, 1,
+                                    function(z) outer(z, z)*exp(sum(z*beta)))), nrow = p + 1)
+    E2 <- matrix(rowSums(apply(event.set, 1,
+                               function(z) outer(z, z)*exp(sum(z*beta)))), nrow = p + 1)
     # Sum over m = 0, ..., d - 1
-    information <- information + Reduce('+', lapply(0:(d-1), efron.denom, d, R0, E0, R1, E1, R2, E2))
+    information <- information + Reduce('+', lapply(0:(d-1), efron.denom,
+                                                    d, R0, E0, R1, E1, R2, E2))
   }
   return(matrix(information[-1, -1], nrow=p))
 }
@@ -305,7 +314,7 @@ summary.fitcox <- function(model) {
 
 #' Print a summary for a fitted Cox model
 #'
-#' @param summary A \code{summary.fitcox} object returned by the \code{summary.fitcox} function.
+#' @param summary A \code{summary.fitcox} object returned by \code{summary.fitcox}.
 #' @return The object of class \code{summary.fitcox}.
 #' @examples
 #' print(summary(fitcox(remission ~ sample, delta="censor", data=leukemia)))
@@ -325,8 +334,8 @@ print.summary.fitcox <- function(summary) {
 #' @details The types of prediction are:
 #' \describe{
 #'    \item{median}{The median survival times given the predictors}
-#'    \item{expected}{The expected number of events at the event or censoring time}
-#'    \item{survival}{The estimated survival probability at the event or censoring time}
+#'    \item{expected}{The expected number of events at the event time}
+#'    \item{survival}{The estimated survival probability at the event time}
 #' }
 #' @examples
 #' predict(fitcox(remission ~ sample, delta="censor", data=leukemia), newdata=leukemia)
@@ -340,7 +349,6 @@ predict.fitcox <- function(model, newdata, type="median") {
   # Add an event time of zero at the start for times that are before the first event
   event.times <- c(0, model$event.times)
   n <- nrow(newdata)
-  #n.event.times <- length(event.times)
   results <- rep(NA, n)
 
   # Extract the event times for the new data
@@ -351,16 +359,15 @@ predict.fitcox <- function(model, newdata, type="median") {
   X <- model.matrix(formula, data=newdata)
   beta <- c(0, model$beta)
   exp.betaX <- exp(X %*% beta)
-  #print(exp.betaX)
 
   # Baseline hazard and cumulative hazard. Cumulative hazard starts at zero.
   h0 <- model$h0
   H0 <- c(0, cumsum(h0))
-  #print(H0)
 
   # Find the index of the event time corresponding to the response time
-  closest.time.indices <- vapply(responses, function(t) tail(which(t >= event.times), n=1), numeric(1))
-  #print(closest.time.indices)
+  closest.time.indices <- vapply(responses,
+                                 function(t) tail(which(t >= event.times), n=1),
+                                 numeric(1))
 
   if (type=="expected") {
     results <- H0[closest.time.indices]*exp.betaX
@@ -377,4 +384,29 @@ predict.fitcox <- function(model, newdata, type="median") {
   }
 
   return(as.vector(results))
+}
+
+#' Generate concordance statistics for a fitted Cox model
+#'
+#' @param model A \code{fitcox} object returned by the \code{fitcox} function.
+#' @param newdata A dataframe of values to generate predictions for.
+#' @param responses The responses to compare the predicted values with
+#' @return A list containing:
+#' \describe{
+#'    \item{n.concordant}{The number of concordant pairs}
+#'    \item{n.discordant}{The number of disccordant pairs}
+#'    \item{c.index}{Harrel's c-index}
+#' }
+#' @examples
+#' concordance.fitcox(fitcox(remission ~ sample, delta="censor", data=leukemia), leukemia, leukemia$remission)
+#' @importFrom DescTools ConDisPairs
+#' @export
+
+concordance.fitcox <- function(model, newdata, responses) {
+  medians <- predict(model, newdata=newdata, type="median")
+  CDPairs <- ConDisPairs(table(responses, medians))
+  n.C <- CDPairs$C
+  n.D <- CDPairs$D
+  c.index <- n.C/(n.C + n.D)
+  return(list(n.concordant=n.C, n.discordant=n.D, c.index=c.index))
 }

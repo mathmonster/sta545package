@@ -35,12 +35,16 @@ plot(fitkm(remission ~ sample, delta="censor", data=leukemia))
 
 ### Cox Proportional Hazards Model
 
+#### Fit a model
+
 ``` r
 fitcox.leukemia <- fitcox(remission ~ sample, delta="censor", data=leukemia)
 summary(fitcox.leukemia)
 #>                   beta   beta.se     lower    upper        z            p
 #> samplecontrol 1.572125 0.4123967 0.7638424 2.380408 3.812167 0.0001377538
 ```
+
+#### Making predictions
 
 ``` r
 predict(fitcox.leukemia, newdata=leukemia, type="expected")
@@ -51,4 +55,18 @@ predict(fitcox.leukemia, newdata=leukemia, type="expected")
 #> [25] 0.16448300 0.21130019 0.30953359 0.30953359 0.41846799 0.41846799
 #> [31] 0.92730867 0.92730867 0.92730867 0.92730867 1.20422089 1.20422089
 #> [37] 1.43975769 1.43975769 1.75295485 2.13922250 2.71839129 3.60901345
+```
+
+#### Calculating the c-index
+
+``` r
+concordance.fitcox(fitcox(remission ~ sample, delta="censor", data=leukemia), leukemia, leukemia$remission)
+#> $n.concordant
+#> [1] 332
+#> 
+#> $n.discordant
+#> [1] 104
+#> 
+#> $c.index
+#> [1] 0.7614679
 ```

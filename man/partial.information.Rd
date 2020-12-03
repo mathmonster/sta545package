@@ -14,7 +14,7 @@ partial.information(beta, event.sets, risk.set.diffs)
 \item{risk.set.diffs}{A list of risk set differences corresponding to the event times}
 }
 \value{
-A matrix of negative second partial derivatives for each pair of parameters in the model
+A matrix of negative second partial derivatives for each pair of parameters
 }
 \description{
 Information matrix for Cox model using Efron's method for ties

@@ -7,7 +7,7 @@
 \method{print}{summary.fitcox}(summary)
 }
 \arguments{
-\item{summary}{A \code{summary.fitcox} object returned by the \code{summary.fitcox} function.}
+\item{summary}{A \code{summary.fitcox} object returned by \code{summary.fitcox}.}
 }
 \value{
 The object of class \code{summary.fitcox}.

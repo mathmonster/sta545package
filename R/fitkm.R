@@ -68,9 +68,10 @@ fitkm <- function(formula, delta, data) {
 #' @export
 
 print.fitkm <- function(model) {
-  print.data <- data.frame(n=vapply(model, function(x) x$n, numeric(1)),
-                           n.events=vapply(model, function(x) sum(x$n.events), numeric(1))
-                           )
+  print.data <- data.frame(n=vapply(model,
+                                    function(x) x$n, numeric(1)),
+                           n.events=vapply(model,
+                                           function(x) sum(x$n.events), numeric(1)))
   print(print.data)
   invisible(model)
 }
@@ -190,7 +191,9 @@ plot.fitkm.curve <- function(curve,  censor=TRUE, ...) {
   # Plot the censored observations
   if (censor) {
     censored <- curve$censored
-    censored.s <- vapply(censored, function(t) surv.prob[max(which(t >= times))], numeric(1))
+    censored.s <- vapply(censored,
+                         function(t) surv.prob[max(which(t >= times))],
+                         numeric(1))
     points(censored, censored.s, type="p", pch="|", ...)
   }
 }
@@ -211,7 +214,9 @@ lines.fitkm.curve <- function(curve, censor=TRUE,  ...) {
   # Plot the censored observations
   if (censor) {
     censored <- curve$censored
-    censored.s <- vapply(censored, function(t) surv.prob[max(which(t >= times))], numeric(1))
+    censored.s <- vapply(censored,
+                         function(t) surv.prob[max(which(t >= times))],
+                         numeric(1))
     points(censored, censored.s, type="p", pch="|", ...)
 
   }

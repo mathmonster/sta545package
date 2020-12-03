@@ -23,8 +23,8 @@ Generate predictions for a fitted Cox model
 The types of prediction are:
 \describe{
    \item{median}{The median survival times given the predictors}
-   \item{expected}{The expected number of events at the event or censoring time}
-   \item{survival}{The estimated survival probability at the event or censoring time}
+   \item{expected}{The expected number of events at the event time}
+   \item{survival}{The estimated survival probability at the event time}
 }
 }
 \examples{

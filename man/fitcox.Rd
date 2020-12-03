@@ -22,6 +22,8 @@ An object of class \code{fitcox}.
 \details{
 The object returned has the attributes:
 \describe{
+   \item{formula}{The formula used to generate the model}
+   \item{delta}{The column containing the censoring indicator}
    \item{n}{The total number of observations}
    \item{n.events}{The number of events i.e. uncensored observations}
    \item{n.times}{The number of distinct event times}
