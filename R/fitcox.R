@@ -390,7 +390,6 @@ predict.fitcox <- function(model, newdata, type="median") {
 #'
 #' @param model A \code{fitcox} object returned by the \code{fitcox} function.
 #' @param newdata A dataframe of values to generate predictions for.
-#' @param responses The responses to compare the predicted values with
 #' @return A list containing:
 #' \describe{
 #'    \item{n.concordant}{The number of concordant pairs}
@@ -398,11 +397,16 @@ predict.fitcox <- function(model, newdata, type="median") {
 #'    \item{c.index}{Harrel's c-index}
 #' }
 #' @examples
-#' concordance.fitcox(fitcox(remission ~ sample, delta="censor", data=leukemia), leukemia, leukemia$remission)
+#' concordance.fitcox(fitcox(remission ~ sample, delta="censor", data=leukemia), leukemia)
 #' @importFrom DescTools ConDisPairs
 #' @export
 
-concordance.fitcox <- function(model, newdata, responses) {
+concordance.fitcox <- function(model, newdata) {
+  # Extract the event times for the new data
+  formula <- model$formula
+  response.var <- all.vars(formula)[1]
+  responses <- newdata[[response.var]]
+
   medians <- predict(model, newdata=newdata, type="median")
   CDPairs <- ConDisPairs(table(responses, medians))
   n.C <- CDPairs$C

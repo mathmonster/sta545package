@@ -4,14 +4,12 @@
 \alias{concordance.fitcox}
 \title{Generate concordance statistics for a fitted Cox model}
 \usage{
-concordance.fitcox(model, newdata, responses)
+concordance.fitcox(model, newdata)
 }
 \arguments{
 \item{model}{A \code{fitcox} object returned by the \code{fitcox} function.}
 
 \item{newdata}{A dataframe of values to generate predictions for.}
-
-\item{responses}{The responses to compare the predicted values with}
 }
 \value{
 A list containing:
@@ -25,5 +23,5 @@ A list containing:
 Generate concordance statistics for a fitted Cox model
 }
 \examples{
-concordance.fitcox(fitcox(remission ~ sample, delta="censor", data=leukemia), leukemia, leukemia$remission)
+concordance.fitcox(fitcox(remission ~ sample, delta="censor", data=leukemia), leukemia)
 }

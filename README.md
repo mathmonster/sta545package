@@ -60,7 +60,7 @@ predict(fitcox.leukemia, newdata=leukemia, type="expected")
 #### Calculating the c-index
 
 ``` r
-concordance.fitcox(fitcox(remission ~ sample, delta="censor", data=leukemia), leukemia, leukemia$remission)
+concordance.fitcox(fitcox.leukemia, newdata=leukemia)
 #> $n.concordant
 #> [1] 332
 #> 
