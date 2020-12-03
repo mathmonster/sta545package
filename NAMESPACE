@@ -2,6 +2,7 @@
 
 S3method(coef,fitcox)
 S3method(lines,fitkm.curve)
+S3method(median,fitkm.curve)
 S3method(plot,fitkm)
 S3method(plot,fitkm.curve)
 S3method(predict,fitcox)

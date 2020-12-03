@@ -125,7 +125,8 @@ plot.fitkm <- function(model, xlab="Time", ylab="Survival Probability", legend.c
 
   # Add a legend if more than one curve being plotted
   if (n.curves > 1) {
-    legend("topright", legend=names(model), col=line.colors, lwd=2, cex=legend.cex)
+    medians <- vapply(model, median.fitkm.curve, numeric(1))
+    legend("topright", legend=paste0(names(model), " (", medians, ")"), col=line.colors, lwd=2, cex=legend.cex)
   }
 }
 
@@ -173,6 +174,18 @@ summary.fitkm.curve <- function(curve) {
                     n.events=curve$n.events,
                     n.risk=curve$n.risk,
                     surv.prob=curve$surv.prob))
+}
+
+#' Median of a fitted Kaplan-Meier curve
+#'
+#' @param curve A \code{fitkm.curve} object returned by the \code{fitkm} function.
+#' @return The median value for the curve.
+#' @export
+
+median.fitkm.curve <- function(curve) {
+  times <- c(0, curve$time)
+  surv.prob <- c(1, curve$surv.prob)
+  return(times[which.max(0.5 >= surv.prob)])
 }
 
 #' Produces a plot for a single fitted Kaplan-Meier curve
