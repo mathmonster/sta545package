@@ -414,3 +414,43 @@ concordance.fitcox <- function(model, newdata) {
   c.index <- n.C/(n.C + n.D)
   return(list(n.concordant=n.C, n.discordant=n.D, c.index=c.index))
 }
+
+#' Generate cross-validation error for a fitted Cox model
+#'
+#' @param data A dataframe of values containing predictors and response.
+#' @param model A \code{fitcox} object returned by the \code{fitcox} function.
+#' @param K The number of groups to use for cross-validation
+#' @return The mean concordance index generated using cross-validated
+#' @examples
+#' cv.fitcox(leukemia, fitcox(remission ~ sample, delta="censor", data=leukemia), 5)
+#' @export
+
+cv.fitcox <- function(data, model, K) {
+  # Formula object and delta to use for model fitting
+  formula <- model$formula
+  delta <- model$delta
+
+  cv.errors <- rep(NA, K)
+  n <- nrow(data)
+
+  # Current indices contain the indices yet to be selected
+  current.indices <- 1:n
+
+  for (i in 1:K) {
+    # Generate fold indices for this value of i
+    fold.size <- round(i*n/K) - round((i-1)*n/K)
+    fold.indices <- sample(current.indices, fold.size)
+    current.indices <- current.indices[! current.indices %in% fold.indices]
+
+    # Generate train and test data sets
+    train.data <- data[-fold.indices, ]
+    test.data <- data[fold.indices, ]
+
+    # Train model on the training data, and concordance index on test data
+    train.model <- fitcox(formula, delta, train.data)
+    cv.errors[i] <- concordance.fitcox(train.model, test.data)$c.index
+  }
+
+  return(mean(cv.errors))
+}
+

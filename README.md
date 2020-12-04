@@ -70,3 +70,10 @@ concordance.fitcox(fitcox.leukemia, newdata=leukemia)
 #> $c.index
 #> [1] 0.7614679
 ```
+
+#### Cross-validated c-index
+
+``` r
+cv.fitcox(leukemia, fitcox(remission ~ sample, delta="censor", data=leukemia), 5)
+#> [1] 0.7470614
+```

@@ -1,7 +1,7 @@
 Package: sta545package
 Type: Package
 Title: STA 545 Project
-Version: 0.3.1
+Version: 0.4.0
 Authors@R: c(
     person("Adam", "Cunningham", email = "adamcunn@buffalo.edu", 
     role = c("aut", "cre")),
@@ -12,6 +12,7 @@ Description: Functions for STA 545 project
 URL: http://github.com/mathmonster/sta545package
 BugReports: https://github.com/mathmonster/sta545package/issues
 Depends: R (>= 3.5.0)
+Imports: DescTools
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

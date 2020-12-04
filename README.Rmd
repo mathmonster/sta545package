@@ -56,3 +56,8 @@ predict(fitcox.leukemia, newdata=leukemia, type="expected")
 ```{r Cox_Model_Concordance}
 concordance.fitcox(fitcox.leukemia, newdata=leukemia)
 ```
+
+#### Cross-validated c-index
+```{r Cox_Model_Cross_Validation}
+cv.fitcox(leukemia, fitcox(remission ~ sample, delta="censor", data=leukemia), 5)
+```
