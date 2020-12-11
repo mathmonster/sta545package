@@ -7,7 +7,7 @@
 \method{print}{fitkm.curve}(curve)
 }
 \arguments{
-\item{curve}{A \code{fitkm.curve} object returned by the \code{fitkm} function.}
+\item{curve}{A \code{fitkm.curve} object returned by \code{fitkm}.}
 }
 \value{
 An object of class \code{summary.fitkm}.

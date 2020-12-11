@@ -7,7 +7,7 @@
 \method{print}{fitkm}(model)
 }
 \arguments{
-\item{model}{A \code{fitkm} object returned by the \code{\link{fitkm}} function.}
+\item{model}{A \code{fitkm} object returned by \code{\link{fitkm}}.}
 }
 \value{
 The object of class \code{fitkm}.

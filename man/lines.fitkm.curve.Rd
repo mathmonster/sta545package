@@ -7,7 +7,7 @@
 \method{lines}{fitkm.curve}(curve, censor = TRUE, ...)
 }
 \arguments{
-\item{curve}{A \code{fitkm.curve} object returned by the \code{fitkm} function.}
+\item{curve}{A \code{fitkm.curve} object returned by \code{fitkm}.}
 
 \item{censor}{Plot the censored observations if \code{TRUE}}
 

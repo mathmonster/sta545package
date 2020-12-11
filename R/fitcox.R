@@ -37,18 +37,22 @@ fitcox <- function(formula, delta, data) {
   event.times <- sort(unique(events))
   k <- length(event.times)
 
-  # Event sets are the sets of non-censored observations corresponding to the event times
+  # Event sets are the sets of non-censored observations corresponding to the
+  # event times
   event.sets <- lapply(event.times,
-                       function(t) model.matrix(formula, data=data[responses == t &
-                                                                     deltas == 1, ]))
+                       function(t) model.matrix(formula,
+                                                data=data[responses == t &
+                                                            deltas == 1, ]))
 
   event.counts <- vapply(event.sets, nrow, numeric(1))
 
-  # Number of coefficients is determined by the factor levels found by model.matrix
+  # Number of coefficients is determined by the factor levels found by
+  # model.matrix
   p <- ncol(event.sets[[1]]) - 1
 
-  # Risk set differences are the sets of all observations with t(i) <= t < t(i + 1)
-  # These are the observations at risk at each event time, but not at the next
+  # Risk set differences are the sets of all observations with
+  # t(i) <= t < t(i + 1). These are the observations at risk at each event time,
+  # but not at the next
   risk.set.diffs <- list()
   for (i in 1:(k-1)) {
     t1 <- event.times[i]
@@ -57,9 +61,10 @@ fitcox <- function(formula, delta, data) {
                                                              responses < t2, ])
   }
   # The last risk set difference contains the risk set for the final event time
-  risk.set.diffs[[k]] <- model.matrix(formula, data=data[responses >= event.times[k], ])
+  risk.set.diffs[[k]] <- model.matrix(formula,
+                                      data=data[responses >= event.times[k], ])
 
-  # Use optim to find the maximum likelihood estimate for the regression coefficients
+  # Use optim to find the MLEs for the regression coefficients
   beta <- optim(as.matrix(rep(0, p)), partial.log.likelihood, gr=partial.score,
                 event.sets, risk.set.diffs,
                 method="BFGS", control=list(fnscale=-1))$par
@@ -100,9 +105,9 @@ fitcox <- function(formula, delta, data) {
 
 #' Log partial likelihood for Cox model using Efron's method for ties
 #'
-#' @param beta A vector of length p, where p is the number of parameters in the model
+#' @param beta A vector of length p, where p is the number of model parameters
 #' @param event.sets A list of model matrices corresponding to the event times
-#' @param risk.set.diffs A list of risk set differences corresponding to the event times
+#' @param risk.set.diffs A list of risk set differences for the event times
 #' @return The log partial likelihood, a scalar
 
 partial.log.likelihood <- function(beta, event.sets, risk.set.diffs) {
@@ -131,9 +136,9 @@ partial.log.likelihood <- function(beta, event.sets, risk.set.diffs) {
 
 #' Score function for Cox model using Efron's method for ties
 #'
-#' @param beta A vector of length p, where p is the number of parameters in the model
+#' @param beta A vector of length p, where p is the number of model parameters
 #' @param event.sets A list of model matrices corresponding to the event times
-#' @param risk.set.diffs A list of risk set differences corresponding to the event times
+#' @param risk.set.diffs A list of risk set differences for the event times
 #' @return A vector of partial derivatives for each parameter in the model
 
 partial.score <- function(beta, event.sets, risk.set.diffs) {
@@ -165,18 +170,18 @@ partial.score <- function(beta, event.sets, risk.set.diffs) {
     E1 <- as.vector(t(event.set)%*%exp.events.beta)
     # First term is the sum of the columns in the event set
     # Second term is the sum over the event set of the log Efron denominator
-    u <- u + apply(event.set, 2, sum) - Reduce('+', lapply(0:(d-1),
-                                                           function(m) (R1 - m*E1/d)/(R0 - m*E0/d)))
+    u <- u + apply(event.set, 2, sum) -
+      Reduce('+', lapply(0:(d-1), function(m) (R1 - m*E1/d)/(R0 - m*E0/d)))
   }
   return(u[-1])
 }
 
 #' Information matrix for Cox model using Efron's method for ties
 #'
-#' @param beta A vector of length p, where p is the number of parameters in the model
+#' @param beta A vector of length p, where p is the number of model parameters
 #' @param event.sets A list of model matrices corresponding to the event times
-#' @param risk.set.diffs A list of risk set differences corresponding to the event times
-#' @return A matrix of negative second partial derivatives for each pair of parameters
+#' @param risk.set.diffs A list of risk set differences for the event times
+#' @return A matrix of negative 2nd partial derivatives for each parameter pair
 
 partial.information <- function(beta, event.sets, risk.set.diffs) {
   k <- length(event.sets)
@@ -186,7 +191,7 @@ partial.information <- function(beta, event.sets, risk.set.diffs) {
   information <- matrix(0, nrow = p + 1, ncol = p + 1)
   beta <- c(0, beta)
 
-  # Running totals of exp(z*beta), z*exp(z*beta), and z*z*exp(z*beta) over the risk sets
+  # Totals of exp(z*beta), z*exp(z*beta), and z*z*exp(z*beta) over the risk sets
   R0 <- 0
   R1 <- rep(0, p + 1)
   R2 <- matrix(0, nrow = p + 1, ncol = p + 1)
@@ -216,9 +221,11 @@ partial.information <- function(beta, event.sets, risk.set.diffs) {
     R1 <- R1 + as.vector(t(risk.set.diff)%*%exp.risk.set.beta)
     E1 <- as.vector(t(event.set)%*%exp.events.beta)
     R2 <- R2 + matrix(rowSums(apply(risk.set.diff, 1,
-                                    function(z) outer(z, z)*exp(sum(z*beta)))), nrow = p + 1)
+                                    function(z) outer(z, z)*exp(sum(z*beta)))),
+                      nrow = p + 1)
     E2 <- matrix(rowSums(apply(event.set, 1,
-                               function(z) outer(z, z)*exp(sum(z*beta)))), nrow = p + 1)
+                               function(z) outer(z, z)*exp(sum(z*beta)))),
+                 nrow = p + 1)
     # Sum over m = 0, ..., d - 1
     information <- information + Reduce('+', lapply(0:(d-1), efron.denom,
                                                     d, R0, E0, R1, E1, R2, E2))
@@ -228,9 +235,9 @@ partial.information <- function(beta, event.sets, risk.set.diffs) {
 
 #' Baseline hazard for a Cox proportional hazards model
 #'
-#' @param beta A vector of length p, where p is the number of parameters in the model
-#' @param event.counts A vector of event counts corresponding to the unique event times
-#' @param risk.set.diffs A list of risk set differences corresponding to the event times
+#' @param beta A vector of length p, where p is the number of model parameters
+#' @param event.counts A vector of event counts for the unique event times
+#' @param risk.set.diffs A list of risk set differences for the event times
 #' @return A vector of partial derivatives for each parameter in the model
 
 baseline.hazard <- function(beta, event.counts, risk.set.diffs) {
@@ -346,7 +353,7 @@ print.summary.fitcox <- function(summary) {
 predict.fitcox <- function(model, newdata, type="median") {
   formula <- model$formula
 
-  # Add an event time of zero at the start for times that are before the first event
+  # Add an event time of zero at the start for times before the first event
   event.times <- c(0, model$event.times)
   n <- nrow(newdata)
   results <- rep(NA, n)
@@ -453,4 +460,3 @@ cv.fitcox <- function(data, model, K) {
 
   return(mean(cv.errors))
 }
-

@@ -7,14 +7,14 @@
 partial.information(beta, event.sets, risk.set.diffs)
 }
 \arguments{
-\item{beta}{A vector of length p, where p is the number of parameters in the model}
+\item{beta}{A vector of length p, where p is the number of model parameters}
 
 \item{event.sets}{A list of model matrices corresponding to the event times}
 
-\item{risk.set.diffs}{A list of risk set differences corresponding to the event times}
+\item{risk.set.diffs}{A list of risk set differences for the event times}
 }
 \value{
-A matrix of negative second partial derivatives for each pair of parameters
+A matrix of negative 2nd partial derivatives for each parameter pair
 }
 \description{
 Information matrix for Cox model using Efron's method for ties

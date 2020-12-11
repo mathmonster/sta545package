@@ -7,7 +7,7 @@
 \method{median}{fitkm.curve}(curve)
 }
 \arguments{
-\item{curve}{A \code{fitkm.curve} object returned by the \code{fitkm} function.}
+\item{curve}{A \code{fitkm.curve} object returned by \code{fitkm}.}
 }
 \value{
 The median value for the curve.

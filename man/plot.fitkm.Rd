@@ -7,7 +7,7 @@
 \method{plot}{fitkm}(model, xlab = "Time", ylab = "Survival Probability", legend.cex = 1, ...)
 }
 \arguments{
-\item{model}{A \code{fitkm} object returned by the \code{\link{fitkm}} function.}
+\item{model}{A \code{fitkm} object returned by \code{\link{fitkm}}.}
 
 \item{xlab}{String for the x-axis label}
 

@@ -7,7 +7,7 @@
 \method{summary}{fitkm}(model)
 }
 \arguments{
-\item{model}{A \code{fitkm} object returned by the \code{\link{fitkm}} function.}
+\item{model}{A \code{fitkm} object returned by \code{\link{fitkm}}.}
 }
 \value{
 A list of summaries for each \code{fitkm.curve} object

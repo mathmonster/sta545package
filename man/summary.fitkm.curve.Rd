@@ -7,7 +7,7 @@
 \method{summary}{fitkm.curve}(curve)
 }
 \arguments{
-\item{curve}{A \code{fitkm.curve} object returned by the \code{\link{fitkm}} function.}
+\item{curve}{A \code{fitkm.curve} object returned by \code{\link{fitkm}}.}
 }
 \value{
 A dataframe containing summary information for each event time.

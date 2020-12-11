@@ -7,11 +7,11 @@
 partial.score(beta, event.sets, risk.set.diffs)
 }
 \arguments{
-\item{beta}{A vector of length p, where p is the number of parameters in the model}
+\item{beta}{A vector of length p, where p is the number of model parameters}
 
 \item{event.sets}{A list of model matrices corresponding to the event times}
 
-\item{risk.set.diffs}{A list of risk set differences corresponding to the event times}
+\item{risk.set.diffs}{A list of risk set differences for the event times}
 }
 \value{
 A vector of partial derivatives for each parameter in the model

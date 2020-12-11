@@ -61,7 +61,7 @@ fitkm <- function(formula, delta, data) {
 
 #' Print details of a set of one or more Kaplan-Meier curves
 #'
-#' @param model A \code{fitkm} object returned by the \code{\link{fitkm}} function.
+#' @param model A \code{fitkm} object returned by \code{\link{fitkm}}.
 #' @return The object of class \code{fitkm}.
 #' @examples
 #' print(fitkm(recovery ~ 1, delta="status", data=data1))
@@ -71,14 +71,15 @@ print.fitkm <- function(model) {
   print.data <- data.frame(n=vapply(model,
                                     function(x) x$n, numeric(1)),
                            n.events=vapply(model,
-                                           function(x) sum(x$n.events), numeric(1)))
+                                           function(x) sum(x$n.events),
+                                           numeric(1)))
   print(print.data)
   invisible(model)
 }
 
 #' Summarize a set of one or more Kaplan-Meier curves
 #'
-#' @param model A \code{fitkm} object returned by the \code{\link{fitkm}} function.
+#' @param model A \code{fitkm} object returned by \code{\link{fitkm}}.
 #' @return A list of summaries for each \code{fitkm.curve} object
 #' @examples
 #' summary(fitkm(recovery ~ 1, delta="status", data=data1))
@@ -90,7 +91,7 @@ summary.fitkm <- function(model) {
 
 #' Produces a plot for a set of one or more Kaplan-Meier curves
 #'
-#' @param model A \code{fitkm} object returned by the \code{\link{fitkm}} function.
+#' @param model A \code{fitkm} object returned by \code{\link{fitkm}}.
 #' @param xlab String for the x-axis label
 #' @param ylab String for the y-axis label
 #' @param legend.cex Font size for the legend
@@ -103,7 +104,8 @@ summary.fitkm <- function(model) {
 #' @importFrom grDevices hcl.colors
 #' @export
 
-plot.fitkm <- function(model, xlab="Time", ylab="Survival Probability", legend.cex=1, ...) {
+plot.fitkm <- function(model, xlab="Time", ylab="Survival Probability",
+                       legend.cex=1, ...) {
   n.curves <- length(model)
   if (n.curves > 1) {
     line.colors <- hcl.colors(n.curves, palette="Zissou 1")
@@ -126,7 +128,8 @@ plot.fitkm <- function(model, xlab="Time", ylab="Survival Probability", legend.c
   # Add a legend if more than one curve being plotted
   if (n.curves > 1) {
     medians <- vapply(model, median.fitkm.curve, numeric(1))
-    legend("topright", legend=paste0(names(model), " (", medians, ")"), col=line.colors, lwd=2, cex=legend.cex)
+    legend("topright", legend=paste0(names(model), " (", medians, ")"),
+           col=line.colors, lwd=2, cex=legend.cex)
   }
 }
 
@@ -152,7 +155,7 @@ fitkm.curve <- function(n, level, time, n.events, n.risk, surv.prob, censored) {
 
 #' Print details of a fitted Kaplan-Meier curve
 #'
-#' @param curve A \code{fitkm.curve} object returned by the \code{fitkm} function.
+#' @param curve A \code{fitkm.curve} object returned by \code{fitkm}.
 #' @return An object of class \code{summary.fitkm}.
 #' @export
 
@@ -163,7 +166,7 @@ print.fitkm.curve <- function(curve) {
 
 #' Produces a summary for a fitted Kaplan-Meier curve
 #'
-#' @param curve A \code{fitkm.curve} object returned by the \code{\link{fitkm}} function.
+#' @param curve A \code{fitkm.curve} object returned by \code{\link{fitkm}}.
 #' @return A dataframe containing summary information for each event time.
 #' @examples
 #' summary(fitkm(recovery ~ 1, delta="status", data=data1))
@@ -178,7 +181,7 @@ summary.fitkm.curve <- function(curve) {
 
 #' Median of a fitted Kaplan-Meier curve
 #'
-#' @param curve A \code{fitkm.curve} object returned by the \code{fitkm} function.
+#' @param curve A \code{fitkm.curve} object returned by \code{fitkm}.
 #' @return The median value for the curve.
 #' @export
 
@@ -190,7 +193,7 @@ median.fitkm.curve <- function(curve) {
 
 #' Produces a plot for a single fitted Kaplan-Meier curve
 #'
-#' @param curve A \code{fitkm.curve} object returned by the \code{fitkm} function.
+#' @param curve A \code{fitkm.curve} object returned by \code{fitkm}.
 #' @param censor Plot the censored observations if \code{TRUE}
 #' @param ... Further graphical parameters
 #' @importFrom graphics points
@@ -213,7 +216,7 @@ plot.fitkm.curve <- function(curve,  censor=TRUE, ...) {
 
 #' Plots a line for a single fitted Kaplan-Meier curve
 #'
-#' @param curve A \code{fitkm.curve} object returned by the \code{fitkm} function.
+#' @param curve A \code{fitkm.curve} object returned by \code{fitkm}.
 #' @param censor Plot the censored observations if \code{TRUE}
 #' @param ... Further graphical parameters
 #' @importFrom graphics lines points
